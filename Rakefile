@@ -56,8 +56,8 @@ task :env do
   output = []
 
   {
-    'format' => 'LOGGING_FORMAT',
-    'level' => 'LOGGING_LEVEL',
+    'format' => 'LOG_FORMAT',
+    'level' => 'LOG_LEVEL',
     'addr' => 'ADDR',
     'addr_tls' => 'ADDR_TLS',
     'domain' => 'DOMAIN',

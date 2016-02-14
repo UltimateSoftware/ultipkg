@@ -18,7 +18,7 @@ var Version = ""
 var Logger = logrus.New()
 
 func init() {
-	logLevel, err := logrus.ParseLevel(config.Get("logging.level", "info"))
+	logLevel, err := logrus.ParseLevel(config.Get("logg.level", "info"))
 	if err != nil {
 		Logger.Panicf("Fatal error: %s \n", err)
 	}
@@ -28,7 +28,7 @@ func init() {
 }
 
 func main() {
-	switch config.Get("logging.format") {
+	switch config.Get("log.format") {
 	case "text":
 		Logger.Formatter = &logrus.TextFormatter{ForceColors: true}
 	default:

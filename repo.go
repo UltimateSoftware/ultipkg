@@ -8,6 +8,7 @@ type Repo struct {
 	Organization string
 	Project      string
 	SubPath      string
+	VCSHost      string
 }
 
 // PkgRoot generates the root import path, sans sub-package.

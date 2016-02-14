@@ -1,19 +1,23 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/nbio/st"
 )
 
-const (
-	Domain   = "pkg.ulti.io"
-	RepoHost = "ssh://git@devgit01.dev.us.corp:7999"
-)
+func TestMain(m *testing.M) {
+	flag.Parse()
+	Domain = "pkg.example.com"
+	VCSHost = "git@git.example.com:7999"
+	os.Exit(m.Run())
+}
 
 type outcome struct {
 	getPath          string
@@ -26,7 +30,7 @@ func (o outcome) importPrefix() string {
 }
 
 func (o outcome) repoRoot() string {
-	return RepoHost + o.repoRootPath + ".git"
+	return "ssh://" + VCSHost + o.repoRootPath + ".git"
 }
 
 var scenarios = map[string]outcome{

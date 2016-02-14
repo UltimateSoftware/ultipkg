@@ -10,12 +10,21 @@ import (
 	"github.com/Sirupsen/logrus"
 )
 
-// Version will be defined by our build and release Rake tasks.
-// We use ldflags to define this as the application compiles.
-var Version = ""
+var (
+	// Version will be defined by our build and release Rake tasks.
+	// We use ldflags to define this as the application compiles.
+	Version = ""
 
-// Logger is our configured instance of Logrus.
-var Logger = logrus.New()
+	// Logger is our configured instance of Logrus.
+	Logger = logrus.New()
+
+	// VCSHost is the user, domain, and port that clients will need
+	// to checkout the code from the server.
+	VCSHost = config.Get("vcs.host", "git@git.example.com")
+
+	// Domain is the actual domain this server is running.
+	Domain = config.Get("domain", "pkg.example.com")
+)
 
 func init() {
 	logLevel, err := logrus.ParseLevel(config.Get("log.level", "info"))
@@ -103,7 +112,8 @@ func ultipkg(w http.ResponseWriter, r *http.Request) {
 	}).Debug("Split path")
 
 	repo := &Repo{
-		Domain: config.Get("domain", "pkg.ulti.io"),
+		Domain:  Domain,
+		VCSHost: VCSHost,
 	}
 
 	if len(fragments) >= 1 {

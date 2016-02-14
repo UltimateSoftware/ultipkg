@@ -8,7 +8,7 @@ const (
 <!doctype>
 <html>
 <head>
-  <meta name="go-import" content="{{.PkgPath}} git ssh://git@devgit01.dev.us.corp:7999/{{.PkgRoot}}.git" />
+  <meta name="go-import" content="{{.PkgPath}} git ssh://{{.VCSHost}}/{{.PkgRoot}}.git" />
 
   <title>UltiPkg - ultimate/dynamite</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">

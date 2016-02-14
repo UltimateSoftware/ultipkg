@@ -5,7 +5,7 @@ import (
 	"strings"
 	"sync"
 
-	config "pkg.ulti.io/ultimate/envconfig"
+	"pkg.ulti.io/ultimate/ultipkg-dist/config"
 
 	"github.com/Sirupsen/logrus"
 )
@@ -18,7 +18,7 @@ var Version = ""
 var Logger = logrus.New()
 
 func init() {
-	logLevel, err := logrus.ParseLevel(config.Get("logg.level", "info"))
+	logLevel, err := logrus.ParseLevel(config.Get("log.level", "info"))
 	if err != nil {
 		Logger.Panicf("Fatal error: %s \n", err)
 	}

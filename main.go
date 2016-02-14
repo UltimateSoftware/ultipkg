@@ -89,10 +89,13 @@ func main() {
 	Logger.Info("shutting down")
 }
 
+// ultipkg is the meat & potatoes of the entire application. This is where
+// we figure out the requested repo and generate the correct response.
 func ultipkg(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("X-Server", "Ultipkg")
 	w.Header().Set("X-Server-Version", Version)
 
+	// Using a logger with fields makes tracing things easier.
 	L := Logger.WithFields(logrus.Fields{
 		"secure":  r.TLS != nil,
 		"agent":   r.UserAgent(),
@@ -100,11 +103,15 @@ func ultipkg(w http.ResponseWriter, r *http.Request) {
 		"version": Version,
 	})
 
+	// For now, the index just returns a 404. This could just as easily return
+	// an actual page, or a redirect to someplace else.
 	if r.URL.Path == "/" {
 		http.NotFound(w, r)
 		return
 	}
 
+	// Split the URL path into its components so we can start extracting data
+	// from it.
 	fragments := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
 	L.WithFields(logrus.Fields{
 		"frags": fragments,
@@ -117,12 +124,15 @@ func ultipkg(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(fragments) >= 1 {
+		// example.com/hello
 		repo.Organization = fragments[0]
 	}
 	if len(fragments) >= 2 {
+		// example.com/hello/world
 		repo.Project = fragments[1]
 	}
 	if len(fragments) > 2 {
+		// example.com/hello/world/goodbye/moon
 		repo.SubPath = strings.Join(fragments[2:], "/")
 	}
 

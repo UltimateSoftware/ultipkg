@@ -1,0 +1,62 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"canonical": "github.com/PuerkitoBio/goquery",
+			"comment": "",
+			"local": "vendor/github.com/PuerkitoBio/goquery",
+			"revision": "60ec77b0032de8548a0d67f76154458850264a99",
+			"revisionTime": "2015-04-20T19:20:24-04:00"
+		},
+		{
+			"canonical": "github.com/Sirupsen/logrus",
+			"comment": "",
+			"local": "vendor/github.com/Sirupsen/logrus",
+			"revision": "4643a7efec9b8fd7548882e7b30095711343100f",
+			"revisionTime": "2015-10-12T17:08:13-04:00"
+		},
+		{
+			"canonical": "github.com/andybalholm/cascadia",
+			"comment": "",
+			"local": "vendor/github.com/andybalholm/cascadia",
+			"revision": "54abbbf07a45a3ef346ebe903e0715d9a3c19352",
+			"revisionTime": "2015-03-27T17:55:34-07:00"
+		},
+		{
+			"canonical": "github.com/joho/godotenv",
+			"comment": "",
+			"local": "vendor/github.com/joho/godotenv",
+			"revision": "4ed13390c0acd2ff4e371e64d8b97c8954138243",
+			"revisionTime": "2015-09-07T11:02:28+10:00"
+		},
+		{
+			"canonical": "github.com/joho/godotenv/autoload",
+			"comment": "",
+			"local": "vendor/github.com/joho/godotenv/autoload",
+			"revision": "4ed13390c0acd2ff4e371e64d8b97c8954138243",
+			"revisionTime": "2015-09-07T11:02:28+10:00"
+		},
+		{
+			"canonical": "github.com/nbio/st",
+			"comment": "",
+			"local": "vendor/github.com/nbio/st",
+			"revision": "e9e8d9816f3268def6dcbd2dea03301f40e9de94",
+			"revisionTime": "2014-06-25T15:07:06-10:00"
+		},
+		{
+			"canonical": "golang.org/x/net/html",
+			"comment": "",
+			"local": "vendor/golang.org/x/net/html",
+			"revision": "7f88271ea9913b72aca44fa7fc8af919eacc17ce",
+			"revisionTime": "2016-02-05T10:48:01+09:00"
+		},
+		{
+			"canonical": "golang.org/x/net/html/atom",
+			"comment": "",
+			"local": "vendor/golang.org/x/net/html/atom",
+			"revision": "7f88271ea9913b72aca44fa7fc8af919eacc17ce",
+			"revisionTime": "2016-02-05T10:48:01+09:00"
+		}
+	]
+}

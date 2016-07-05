@@ -22,11 +22,11 @@ There are some option you can pass as environment variables. The below is an exa
 
 Issue the following command:
 
-    go get pkg.ulti.io/{project}/{repository}/{optional_path}
+    go get pkg.example.com/{project}/{repository}/{optional_path}
 
 This will clone the repo into the following path:
 
-    $GOPATH/src/pkg.ulti.io/{project}/{repository}
+    $GOPATH/src/pkg.examnple.com/{project}/{repository}
 
 ### Caveats
 

@@ -26,7 +26,7 @@ Issue the following command:
 
 This will clone the repo into the following path:
 
-    $GOPATH/src/pkg.examnple.com/{project}/{repository}
+    $GOPATH/src/pkg.example.com/{project}/{repository}
 
 ### Caveats
 

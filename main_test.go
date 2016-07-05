@@ -81,16 +81,3 @@ func BenchmarkRealSubPackage(b *testing.B) {
 		get("/uc/tenantmanagement/a/b/c")
 	}
 }
-
-// func BenchmarkFauxPackage(b *testing.B) {
-// 	for i := 0; i < b.N; i++ {
-// 		b.ReportAllocs()
-// 		subject.Get("/ultimate/ultipkg")
-// 	}
-// }
-// func BenchmarkFauxSubPackage(b *testing.B) {
-// 	for i := 0; i < b.N; i++ {
-// 		b.ReportAllocs()
-// 		subject.Get("/ultimate/ultipkg/a/b/c")
-// 	}
-// }

@@ -1,79 +1,82 @@
 require 'fileutils'
 
 APP_NAME = 'ultipkg'
+TARGETS = [
+  {os: "linux", arch: "amd64"},
+  {os: "linux", arch: "386"},
+  {os: "windows", arch: "amd64"},
+  {os: "windows", arch: "386"},
+  {os: "darwin", arch: "amd64"},
+]
+
+$process_list = []
+at_exit { terminate_all }
 
 task :default => [:test, :run]
-
-desc "Run tests"
-task :test do |t|
-  puts "Running tests...\n"
-  unless system %Q{go test ./...}
-    exit(1)
-  end
-end
-
-desc "Build for release"
-task :release do
-  puts "Building #{APP_NAME}-#{version} for release ..."
-
-  [
-    {os: "linux", arch: "amd64"},
-    {os: "linux", arch: "386"},
-    {os: "windows", arch: "amd64"},
-    {os: "windows", arch: "386"},
-    {os: "darwin", arch: "amd64"},
-  ].each do |t|
-    puts "\tBuilding for: #{t}"
-
-    unless system %Q{GOOS=#{t[:os]} GOARCH=#{t[:arch]} go build -o "bin/#{APP_NAME}-#{version}-#{t[:os]}-#{t[:arch]}" -ldflags "#{ldflags}"}
-      exit(1)
-    end
-  end
-end
-
-desc "Build to run locally"
-task :build => :env do
-  cancel_clean('Halting build...')
-  puts "Building #{APP_NAME}-#{version} ..."
-  unless system %Q{go build -ldflags "#{ldflags}" -o "bin/#{APP_NAME}"}
-    exit(1)
-  end
-end
 
 desc "Clean packages created in bin"
 task :clean do
   system "rm -rf ./bin/"
 end
 
-desc "Build and Run"
-task :run => [:env, :build] do
-  cancel_clean('Shutting down ...')
-  puts 'Starting application ...'
-  run("./bin/#{APP_NAME}")
+desc "Run go generate"
+task :generate do
+  step "Generating for #{APP_NAME}-#{version}" do
+    go_generate
+  end
 end
 
-task :env do
-  output = []
+desc "Run tests"
+task :test => :generate do |t|
+  puts "Running tests...\n"
+  exit(go_test)
+end
 
-  {
-    'format' => 'LOG_FORMAT',
-    'level' => 'LOG_LEVEL',
-    'addr' => 'ADDR',
-    'addr_tls' => 'ADDR_TLS',
-    'domain' => 'DOMAIN',
-    'version' => 'VERSION',
-    'certificate' => 'SSL_CERTIFICATE',
-    'key' => 'SSL_PRIVATEKEY',
-  }.each do |flag, key|
-    unless ENV[flag].nil?
-      ENV[key] = ENV[flag]
-      output << "#{key} = #{ENV[flag]}"
-    end
+desc "Build to run locally"
+task :build => :generate do
+  step "Building #{APP_NAME}-#{version}" do
+    go_build
   end
+end
 
-  unless output.empty?
-    puts 'Overriding default environment:'
-    output.each {|l| puts "\t#{l}" }
+desc "Build and Run"
+task :run => :build do
+  puts 'Starting application...'
+  go_run
+end
+
+desc "Watch and re-run the application"
+task :watch, [:paths] => :build do |t, args|
+
+  puts 'Starting application...'
+  pid = go_run!
+
+  watch "**/*.go", "*.go", args.paths do
+    terminate(pid)
+
+    step "Regenerating" do
+      go_generate
+    end
+
+    puts "Retesting..."
+    go_test(SHORT)
+
+    step "Rebuilding" do
+      go_build
+    end
+
+    pid = go_run!
+  end
+end
+
+desc "Build for release"
+task :release do
+  puts "Building #{APP_NAME}-#{version} for release..."
+
+  TARGETS.each do |t|
+    step "\tBuilding for: #{t}" do
+      exit(1) unless system %Q{GOOS=#{t[:os]} GOARCH=#{t[:arch]} go build -o "bin/#{APP_NAME}-#{version}-#{t[:os]}-#{t[:arch]}" -ldflags "#{ldflags}"}
+    end
   end
 end
 
@@ -81,38 +84,32 @@ def version
   ENV['VERSION'] || `git describe --tags --dirty --always`.chomp
 end
 
-def run(cmd, &blk)
-  subprocess(cmd) do |stdout, stderr, thread|
-    if stdout
-      if blk.nil?
-        puts stdout
-      else
-        blk.call(stdout)
-      end
-    end
-    puts stderr if stderr
+def run(cmd)
+  pid = Process.spawn(cmd)
+  $process_list << pid
+  pid
+end
+
+def wait(pid)
+  Process.wait(pid)
+  $process_list.delete_if {|pid| pid == pid}
+  return $?.exitstatus
+end
+
+def run_and_wait(cmd)
+  wait(run(cmd))
+end
+
+def terminate(pid, sig = "SIGINT")
+  begin
+    Process.kill(sig, pid)
+  rescue Errno::ESRCH
+    # noop
   end
 end
 
-def subprocess(cmd, &block)
-  # see: http://stackoverflow.com/a/1162850/83386
-  Open3.popen3(cmd) do |stdin, stdout, stderr, thread|
-    # read each stream from a new thread
-    { :out => stdout, :err => stderr }.each do |key, stream|
-      Thread.new do
-        until (line = stream.gets).nil? do
-          # yield the block depending on the stream
-          if key == :out
-            yield line, nil, thread if block_given?
-          else
-            yield nil, line, thread if block_given?
-          end
-        end
-      end
-    end
-
-    thread.join # don't exit until the external process is done
-  end
+def terminate_all(sig = "SIGINT")
+  $process_list.each { |pid| terminate(pid, sig) }
 end
 
 def cancel_clean(msg)
@@ -124,14 +121,82 @@ def cancel_clean(msg)
   end
 end
 
+def go_version
+  `go version`.strip.split(' ')[2].split('')[2..4].join.to_f
+end
+
+SHORT = true
+def go_test(short = false)
+  flags = []
+  flags << "-short" if short
+
+  run_and_wait("go test #{flags.join(' ')} $(go list ./... | grep -v /vendor/)")
+end
+
+def go_generate
+  cancel_clean('Halting generate...')
+  exit(1) unless system %Q{go generate ./...}
+end
+
+def go_build
+  cancel_clean('Halting build...')
+  exit(1) unless system %Q{go build -ldflags "#{ldflags}" -o "bin/#{APP_NAME}"}
+end
+
+def go_run
+  wait(go_run!)
+end
+
+def go_run!
+  cancel_clean('Shutting down...')
+  run("./bin/#{APP_NAME}")
+end
+
+def watch(*paths)
+  with_commands :fswatch do
+    cancel_clean('Stopping watcher...')
+    while
+      system %Q{fswatch -r -1 #{paths.join(' ')}}
+      yield
+    end
+  end
+end
+
+def with_commands(*tools)
+  tools.each do |t|
+    brew_install(t)
+  end
+
+  yield if block_given?
+end
+
+def installed?(tool)
+  `which #{tool} > /dev/null; echo $?`.chomp == "0"
+end
+
+def brew_install(tool)
+  cancel_clean('Stopping brew install...')
+  return if installed?(tool)
+  step "Installing missing tool '#{tool}' with brew" do
+    exit(1) unless `brew install #{tool}`
+  end
+end
+
+def step(msg)
+  print "#{msg}... "
+  if block_given?
+    yield
+    print "done."
+  end
+  print "\n"
+end
+
 def ldflags
-  if go15?
+  if go_version >= 1.5
     "-X main.Version=#{version}"
   else
     "-X main.Version '#{version}'"
   end
 end
 
-def go15?
-  !!(`go version` =~ /go1.5/)
-end
+

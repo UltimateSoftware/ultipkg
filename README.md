@@ -34,3 +34,4 @@ Make sure the following is true (if not, make it so):
 
 * You have access to the git repo you are trying to import
 * You have configured your SSH keys with your repo host
+* You have the environment variable GO15VENDOREXPERIMENT=1 if go1.5 >= `GO version in use` < go1.6.

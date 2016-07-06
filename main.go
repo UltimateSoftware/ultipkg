@@ -5,7 +5,7 @@ import (
 	"strings"
 	"sync"
 
-	"pkg.ulti.io/ultimate/ultipkg-dist/config"
+	"ultipkg/config"
 
 	"github.com/Sirupsen/logrus"
 )

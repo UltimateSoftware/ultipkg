@@ -1,4 +1,4 @@
-# UltiPkg
+# UltiPkg [ ![Codeship Status for UltimateSoftware/ultipkg](https://codeship.com/projects/3786b7d0-2595-0134-fb01-0e3391f87f23/status?branch=master)](https://codeship.com/projects/161776)
 
 Ultipkg helps make code `go get`-able. Ultipkg does not hold any package code; instead it will redirect the go tool to the respective Git repository.
 

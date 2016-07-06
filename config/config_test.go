@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
+	config "github.com/UltimateSoftware/ultipkg/config"
 	"github.com/nbio/st"
-	config "pkg.ulti.io/ultimate/ultipkg-dist/config"
 )
 
 func TestMain(m *testing.M) {

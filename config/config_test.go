@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/nbio/st"
-	config "pkg.ulti.io/ultimate/ultipkg-dist/config"
+	config "ultipkg/config"
 )
 
 func TestMain(m *testing.M) {
